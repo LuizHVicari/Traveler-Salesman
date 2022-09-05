@@ -21,3 +21,7 @@ def file_reader(path : str):
         graph = tuple(graph)
         
     return graph, dimension
+
+def write_file(text: str, path : str='default_output_file.txt', mode : str='w'):
+    with open(path, mode) as output_file:
+        output_file.write(text)

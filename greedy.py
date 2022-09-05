@@ -1,5 +1,5 @@
 from time import process_time
-from utils import file_reader
+from utils import file_reader, write_file
 
 
 def greedy_traveler_salesman(graph, first=0):
@@ -37,25 +37,63 @@ def greedy_traveler_salesman(graph, first=0):
         traveled.append(current)
         distance_traveled += minimum_distance
 
-        end = process_time()
+    # if it is possible to travel from the last element to the first one  
+    if graph[current][first] != 0:
+        traveled.append(first)
+        traveled.remove(first)
+
+        distance_traveled += graph[minimum_distance_index][first]
     
-    traveled.append(first)
-    traveled.remove(first)
+    else:
+        # list for the way back to the first element
+        back_traveling = [current]
 
-    distance_traveled += graph[minimum_distance_index][first]
+        # while it hasen't reached the first element
+        while(traveled[-1] != first):
+            minimum_distance = False
+            minimum_distance_index = False
 
+            # if it's possible to travel from the new last element to the first one
+            if graph[current][first] != 0:
+                traveled.append(current)
+                distance_traveled += graph[current][first]
+
+            # if it's not possible to do so, it will travel always to the closest element and try to reach the first element from there
+            else:
+                for distance_index in range(len(graph)):
+
+                    if not(distance_index in back_traveling):
+
+                        if not(minimum_distance) and graph[current][distance_index] != 0:
+                            minimum_distance = graph[current][distance_index]
+                            minimum_distance_index = distance_index
+
+                        elif minimum_distance > graph[current][distance_index] and graph[current][distance_index] != 0:
+                            minimum_distance = graph[current][distance_index]
+                            minimum_distance_index = distance_index
+
+        # updates all variables for the TSP
+        current = minimum_distance_index
+        back_traveling.append(current)
+        distance_traveled += minimum_distance
+        traveled.append(current)
+
+    end = process_time()
     return distance_traveled, traveled, end - start
 
-start_time = process_time()
+if __name__ == '__main__':
+    start_time = process_time()
 
-files = ('TSPLIB/br17.atsp', 'TSPLIB/ft53.atsp', 'TSPLIB/ft70.atsp', 'TSPLIB/ftv33.atsp', 'TSPLIB/ftv35.atsp', 'TSPLIB/ftv38.atsp', 'TSPLIB/ftv44.atsp', 'TSPLIB/ftv47.atsp', 'TSPLIB/ftv55.atsp', 'TSPLIB/ftv64.atsp', 'TSPLIB/ftv70.atsp', 'TSPLIB/ftv170.atsp', 'TSPLIB/kro124p.atsp', 'TSPLIB/p43.atsp', 'TSPLIB/rbg323.atsp', 'TSPLIB/rbg358.atsp', 'TSPLIB/rbg403.atsp', 'TSPLIB/rbg443.atsp', 'TSPLIB/ry48p.atsp')
-output = ''
+    # list with all the atsp files on http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/atsp/
+    files = ('TSPLIB/br17.atsp', 'TSPLIB/ft53.atsp', 'TSPLIB/ft70.atsp', 'TSPLIB/ftv33.atsp', 'TSPLIB/ftv35.atsp', 'TSPLIB/ftv38.atsp', 'TSPLIB/ftv44.atsp', 'TSPLIB/ftv47.atsp', 'TSPLIB/ftv55.atsp', 'TSPLIB/ftv64.atsp', 'TSPLIB/ftv70.atsp', 'TSPLIB/ftv170.atsp', 'TSPLIB/kro124p.atsp', 'TSPLIB/p43.atsp', 'TSPLIB/rbg323.atsp', 'TSPLIB/rbg358.atsp', 'TSPLIB/rbg403.atsp', 'TSPLIB/rbg443.atsp', 'TSPLIB/ry48p.atsp')
+    output = ''
 
-for file in files:
-    data = greedy_traveler_salesman(file_reader(file)[0])
-    output += file.replace('TSPLIB/', '').replace('.atsp', '') + ':'
-    for i in range(8 - len(file.replace('TSPLIB/', '').replace('.atsp', ''))):
-        output += ' '
-    output +=  f' distance: {data[0]}, execution time: {data[2]:.60f} s\n'
-with open('greedy_output.txt', 'w') as output_file:
-    output_file.write('Greedy Output:\n' + output + f'total time:{ (process_time() - start_time)} s')
+    # runs the greedy method on all the files listed above and appends its returned data on a string
+    for file in files:
+        data = greedy_traveler_salesman(file_reader(file)[0])
+        output += file.replace('TSPLIB/', '').replace('.atsp', '') + ':'
+        for i in range(8 - len(file.replace('TSPLIB/', '').replace('.atsp', ''))):
+            output += ' '
+        output +=  f' distance: {data[0]}, execution time: {data[2]:.60f} s\n'
+
+    write_file('Greedy output:\n' + output +f'total time: {process_time() - start_time} s', 'greedy_output.txt', 'w')
