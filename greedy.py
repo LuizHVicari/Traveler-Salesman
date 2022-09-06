@@ -2,7 +2,7 @@ from time import process_time
 from utils import file_reader, write_file
 
 
-def greedy_traveler_salesman(graph, first=0):
+def greedy_traveler_salesman(graph, first : int=0):
     '''
     receives a graph and returns the distance found for the traveler salesman, the path and the execution time
     '''
@@ -23,7 +23,7 @@ def greedy_traveler_salesman(graph, first=0):
             if not(distance_index in traveled):
 
                 # sets the minimum distance as the first available sitance in the current position
-                if not(minimum_distance) and graph[current][distance_index] != 0:
+                if not(minimum_distance) and graph[current][distance_index] != 0 and distance_index != current:
                     minimum_distance = graph[current][distance_index]
                     minimum_distance_index = distance_index
 
@@ -45,7 +45,9 @@ def greedy_traveler_salesman(graph, first=0):
         distance_traveled += graph[minimum_distance_index][first]
     
     else:
-        # list for the way back to the first element
+        return False
+
+        '''# list for the way back to the first element
         back_traveling = [current]
 
         # while it hasen't reached the first element
@@ -72,11 +74,12 @@ def greedy_traveler_salesman(graph, first=0):
                             minimum_distance = graph[current][distance_index]
                             minimum_distance_index = distance_index
 
-        # updates all variables for the TSP
+        updates all variables for the TSP
         current = minimum_distance_index
         back_traveling.append(current)
         distance_traveled += minimum_distance
         traveled.append(current)
+        '''
 
     end = process_time()
     return distance_traveled, traveled, end - start
@@ -94,6 +97,10 @@ if __name__ == '__main__':
         output += file.replace('TSPLIB/', '').replace('.atsp', '') + ':'
         for i in range(8 - len(file.replace('TSPLIB/', '').replace('.atsp', ''))):
             output += ' '
-        output +=  f' distance: {data[0]}, execution time: {data[2]:.60f} s\n'
+        
+        if data != False:
+            output +=  f' distance: {data[0]}, execution time: {data[2]:.60f} s\n'
+        else:
+            output += 'Não há solução gulosa para este grafo\n'
 
     write_file('Greedy output:\n' + output +f'total time: {process_time() - start_time} s', 'greedy_output.txt', 'w')
