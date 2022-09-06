@@ -1,4 +1,3 @@
 TSPLIB
 greedy_output.txt
-TrabalhoPA.ipynb
-/_pychache_/
+__pycache__/
