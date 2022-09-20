@@ -1,5 +1,5 @@
 from time import process_time
-from utils import file_reader, greedy_traveler_salesman, write_markdown
+from utils import greedy_traveler_salesman, file_reader, write_markdown
 
 
 if __name__ == '__main__':

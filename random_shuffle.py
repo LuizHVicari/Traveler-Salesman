@@ -1,4 +1,4 @@
-from utils import file_reader, greedy_traveler_salesman, local_search, write_markdown
+from utils import file_reader, greedy_traveler_salesman, random_shuffle_search, write_markdown
 from cmath import inf
 
 
@@ -12,18 +12,17 @@ if __name__ == '__main__':
     times = list()
     total_time = 0
 
-    iterations = 3
+    iterations = 1000
 
     for file in files:
         graph = file_reader(file)
         greedy = greedy_traveler_salesman(graph[0])
-        solution = local_search(graph[0], greedy[1], iterations)
+        solution = random_shuffle_search(graph[0], greedy[1], iterations)
         if min(solution[0]) < inf:
             local_best_solutions.append(min(solution[0]))
-            times.append(solution[2] * 1000)
         else:
             local_best_solutions.append('Não se aplica')
-            times.append('Não se aplica')
+        times.append(solution[2])
        
     graph_names = list()
     for file in files:
