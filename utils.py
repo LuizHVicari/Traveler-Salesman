@@ -1,7 +1,10 @@
 from cmath import inf
 from queue import PriorityQueue
+from threading import local
 from time import process_time
+from random import shuffle
 import mdutils
+
 
 def file_reader(path : str):
     '''
@@ -60,13 +63,13 @@ def djikstra(graph : tuple, destiny : int=0, origin : int=0):
     return final_distance
 
 
-def greedy_traveler_salesman(graph, first : int=0):
+def greedy_traveler_salesman(graph):
     '''
     receives a graph and returns the distance found for the traveler salesman, the path and the execution time
     '''
+    current = first = 0
     traveled = [first]
     distance_traveled = 0
-    current = first
 
     start = process_time()
 
@@ -97,13 +100,11 @@ def greedy_traveler_salesman(graph, first : int=0):
 
     # if it is possible to travel from the last element to the first one  
     if graph[current][first] != 0:
-        traveled.append(first)
-        traveled.remove(first)
 
         distance_traveled += graph[minimum_distance_index][first]
     
     else:
-        return False
+        return [False, False, False]
 
     end = process_time()
     return distance_traveled, traveled, end - start
@@ -112,7 +113,7 @@ def greedy_traveler_salesman(graph, first : int=0):
 def write_markdown(graph_name : list, best_solutions : list, graph_solutions : list, graph_time : list, strategy : str, name : str = 'Output', title : str = 'Title', author : str = 'Luiz Vicari',):
 
     file = mdutils.MdUtils(file_name=name, title=title)
-    table_content = ['Grafo', 'Melhor solução conhecida', 'Solução encontrada', 'Tempo de Execução (ms)']
+    table_content = ['Grafo', 'Melhor solução conhecida', 'Solução encontrada', 'Tempo de Execução (s)']
 
     for g_name, g_time, g_best_solution, g_solution in zip(graph_name, graph_time, best_solutions, graph_solutions):
         table_content.append(g_name)
@@ -125,11 +126,61 @@ def write_markdown(graph_name : list, best_solutions : list, graph_solutions : l
     file.create_md_file()
 
 
-if __name__ == '__main__':
+def local_search(graph : list(), path : list(), iterations):
 
-    graph = ((999, 3, 5, 6),
-            (4, 999, 7, 9),
-            (5, 7, 999, 8),
-            (4, 1, 8, 999))
-    print(djikstra(graph, 4, 0))
-    write_markdown('teste', 'teste')
+    distances = []
+    paths = []
+
+    if path == False:
+        new_path = [i for i in range(0, len(graph) - 1)]
+    else:
+        new_path = path
+    new_path.pop(0)
+
+    start = process_time()
+
+    for i in range(iterations):
+        shuffle(new_path)
+        new_path.append(0)
+        distance = path_tester(graph, new_path)
+        new_path.pop(len(new_path) - 1)
+
+        if distance > 0 and distance < inf:
+            distances.append(distance)
+            paths.append(new_path)
+    if distances == []:
+        distances = [inf]
+        paths = [inf]
+    return distances, paths, process_time() - start
+
+
+def path_tester(graph : list(), path : list()):
+    current = 0
+    traveled = []
+    distance = 0
+    pos = 0
+
+    while(len(traveled) != len(path) - 1):
+        distance_aux = graph[current][path[pos]]
+        tester = path[pos]
+        if path[pos] == 0:
+            return inf
+            
+        elif distance_aux != 0:
+            distance += graph[current][path[pos]]
+            current = path[pos]
+            pos += 1
+            traveled.append(current)
+        elif distance_aux == 0:
+            return inf
+
+    return distance
+
+
+
+if __name__ == '__main__':
+    graph = file_reader('TSPLIB/rbg403.atsp')
+    greedy = greedy_traveler_salesman(graph[0])
+    solution = local_search(graph[0], greedy[1])
+    print(solution)
+    print(min(solution[0]))
