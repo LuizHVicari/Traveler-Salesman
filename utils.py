@@ -1,6 +1,5 @@
 from cmath import inf
 from queue import PriorityQueue
-from threading import local
 from time import process_time
 from random import shuffle
 import mdutils
@@ -112,7 +111,7 @@ def greedy_traveler_salesman(graph):
 
 def write_markdown(graph_name : list, best_solutions : list, graph_solutions : list, graph_time : list, strategy : str, name : str = 'Output', title : str = 'Title', author : str = 'Luiz Vicari',):
 
-    file = mdutils.MdUtils(file_name=name, title=title)
+    file = mdutils.MdUtils(file_name=name, title=title, author=author)
     table_content = ['Grafo', 'Melhor solução conhecida', 'Solução encontrada', 'Tempo de Execução (s)']
 
     for g_name, g_time, g_best_solution, g_solution in zip(graph_name, graph_time, best_solutions, graph_solutions):
