@@ -1,7 +1,4 @@
-from time import process_time
-from utils import greedy_traveler_salesman, file_reader, write_markdown
-
-
+from utils import *
 if __name__ == '__main__':
 
     # list with all the atsp files on http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/atsp/ and their best known solution
@@ -14,6 +11,7 @@ if __name__ == '__main__':
     best_solutions.pop(files.index('TSPLIB/rbg403.atsp'))
     files.pop(files.index('TSPLIB/rbg403.atsp'))
 
+
     # variables for writing the solution
     output = ''
     solution = list()
@@ -21,16 +19,12 @@ if __name__ == '__main__':
 
     # runs the greedy method on all the files listed above and appends its returned data on a string
     for file in files:
-        data = greedy_traveler_salesman(file_reader(file)[0])
-        
-        if False not in data:
-            solution.append(f'{data[0]}')
-            solution_time.append(f'{data[2]}')
-        else:
-            output += 'Não há solução gulosa para este grafo\n'
-            solution.append('Não encontrada')
-            solution_time.append('Não se aplica')
-
+        # print(file)
+        graph, dimensions = file_utils.file_reader(file)
+        path = greedy_utils.greedy_traveler_salesman(graph)[1]
+        data = local_search_utils.local_search(graph, path)
+        solution.append(f'{data[1]}')
+        solution_time.append(f'{data[2]}')
     # formats the file name
     graph_names = list()
     for file in files:
@@ -42,6 +36,7 @@ if __name__ == '__main__':
         best_solutions=best_solutions, 
         graph_solutions=solution, 
         graph_time=solution_time, 
-        strategy='Estratégia Gulosa', 
-        name='GreedyOutput', 
-        title='Estudo estratégia gulosa para solução do problema do caixeiro viajante'.title())
+        strategy='Busca Local', 
+        name='Local_search', 
+        title='Estudo busca local para solução do problema do caixeiro viajante'.title())
+    
